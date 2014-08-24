@@ -103,8 +103,8 @@ public class MainLoopActor extends Actor {
     boolean flipBlocksUpper = false;
     boolean flipBlocksLower = false;
 
-    int levelId = 1;
-    int maxLevelId = 7;
+    int levelId = 7;
+    int maxLevelId = 8;
 
     public enum State {
         SPLASHSCREEN, RUNNING, FADEINLEVEL, FADEOUTLEVEL, FINSIHED
@@ -115,7 +115,7 @@ public class MainLoopActor extends Actor {
     float fadeInTime = 1.0f;
 
     public MainLoopActor() {
-                setBounds(getX(), getY(), 8, 8);
+        setBounds(getX(), getY(), 8, 8);
         setOrigin(getWidth()/2, getHeight()/2);
     }
     

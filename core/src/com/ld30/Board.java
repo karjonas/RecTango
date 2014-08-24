@@ -111,6 +111,10 @@ public class Board extends Actor {
         customBlocks = new HashMap<Integer, CustomBlock>();
     }
     
+    public int getHashKey(int h, int w) {
+        return num_height*h + w;
+    }
+    
     public void setupBoard(char _positions[][], int unit_x, int unit_y) {
         positions = _positions;
         unit.pos_x = unit_x;
@@ -125,7 +129,9 @@ public class Board extends Actor {
         // Add custom actors
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
-                int hashKey = 2^h*3^w;
+                
+                int hashKey = getHashKey(h,w);
+                System.out.println(hashKey);
                 int x = offset_x + w * block_width;
                 int y = offset_y + h * block_height;
                 
@@ -151,12 +157,12 @@ public class Board extends Actor {
     public void flipBlocks() {
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
+                int hashKey = getHashKey(h, w);
+
                 if (positions[h][w] == 'r') {
-                    int hashKey = 2 ^ h * 3 ^ w;
                     customBlocks.get(hashKey).texture = textureHappy;
                     positions[h][w] = 'g';
                 } else if(positions[h][w] == 'g') {
-                    int hashKey = 2 ^ h * 3 ^ w;
                     customBlocks.get(hashKey).texture = textureSad;
                     positions[h][w] = 'r';
                 }
@@ -215,7 +221,7 @@ public class Board extends Actor {
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
                 if (positions[h][w] == 'r' || positions[h][w] == 'g') {
-                    int hashKey = 2 ^ h * 3 ^ w;
+                    int hashKey = getHashKey(h,w);
                     customBlocks.get(hashKey).draw(batch, alpha);
                 }
             }
