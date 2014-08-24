@@ -23,9 +23,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -96,12 +96,14 @@ public class MainLoopActor extends Actor {
     LayoutData layout;
 
     BitmapFont font;
-    
+    Sound flipSound;
+    Sound winSound;
+
     int lastPressedKey = 0;
     boolean flipBlocksUpper = false;
     boolean flipBlocksLower = false;
 
-    int levelId = 6;
+    int levelId = 1;
     int maxLevelId = 7;
 
     public enum State {
@@ -136,6 +138,10 @@ public class MainLoopActor extends Actor {
         
         font = new BitmapFont(Gdx.files.internal("PressStart2P.fnt"),
                 Gdx.files.internal("PressStart2P.png"), false);
+        font.setColor(196 / 255f, 207 / 255f, 161 / 255f, 1.0f);
+        flipSound = Gdx.audio.newSound(Gdx.files.internal("blip.wav"));
+        winSound = Gdx.audio.newSound(Gdx.files.internal("level_win.wav"));
+
     }
 
     @Override
@@ -162,9 +168,11 @@ public class MainLoopActor extends Actor {
         } else if (state == State.RUNNING) {
             { // Flip blocks
                 if (flipBlocksUpper && !flipBlocksLower) {
+                    flipSound.play();
                     upperBoard.flipBlocks();
                 } else if (!flipBlocksUpper && flipBlocksLower) {
                     lowerBoard.flipBlocks();
+                    flipSound.play();
                 }
 
                 flipBlocksUpper = false;
@@ -177,6 +185,7 @@ public class MainLoopActor extends Actor {
                     state = State.FADEOUTLEVEL;
                     upperBoard.addAction(Actions.fadeOut(0.5f));
                     lowerBoard.addAction(Actions.fadeOut(0.5f));
+                    winSound.play();
                 }
             }
             

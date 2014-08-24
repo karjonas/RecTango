@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.audio.Sound;
 
 /**
  *
@@ -29,6 +30,7 @@ public class Unit extends Actor {
     int pos_y_prev = 0;
     
     boolean isMoving;
+    
 
     public Unit(Board _board) {
         texture = new Texture(Gdx.files.internal("unit.png"));
