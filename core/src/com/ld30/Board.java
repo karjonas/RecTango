@@ -106,7 +106,6 @@ public class Board extends Actor {
             for (int h = 0; h < num_height; h++) {
                 
                 int hashKey = getHashKey(h,w);
-                System.out.println(hashKey);
                 int x = offset_x + w * block_width;
                 int y = offset_y + h * block_height;
                 
