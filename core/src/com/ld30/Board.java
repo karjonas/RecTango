@@ -199,7 +199,6 @@ public class Board extends Actor {
     
     public void drawBoard(float alpha) {
         alpha = currentAlpha * alpha;
-        System.out.println(alpha);
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
                 if (positions[h][w] == 'w') {
@@ -226,13 +225,11 @@ public class Board extends Actor {
     
     @Override
     public void draw(Batch batch, float alpha) {
-        //System.out.println(alpha);
         Color color = getColor();
         batch.setColor(color.r, color.g, color.b, color.a * alpha);
-                currentAlpha = color.a * alpha;
+        currentAlpha = color.a * alpha;
 
-        drawHappySadBlocks(batch,color.a*alpha);
-        //unit.draw(batch, color.a*alpha);
+        drawHappySadBlocks(batch, color.a * alpha);
     }
 
     //@Override

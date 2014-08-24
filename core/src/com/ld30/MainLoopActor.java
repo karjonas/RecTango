@@ -95,17 +95,19 @@ public class MainLoopActor extends Actor {
     LevelCollection levels;
     LayoutData layout;
 
+    BitmapFont font;
+    
     int lastPressedKey = 0;
     boolean flipBlocksUpper = false;
     boolean flipBlocksLower = false;
 
-    int levelId = 4;
+    int levelId = 0;
 
     public enum State {
-        RUNNING, FADEINLEVEL, FADEOUTLEVEL
+        SPLASHSCREEN, RUNNING, FADEINLEVEL, FADEOUTLEVEL
     };
     
-    State state = State.FADEINLEVEL;
+    State state = State.SPLASHSCREEN;
     
     float fadeInTime = 1.0f;
     float currentFadeTime = 0.0f;
@@ -129,12 +131,18 @@ public class MainLoopActor extends Actor {
         stage.addActor(upperBoard.unit);
         stage.addActor(lowerBoard.unit);
         stage.addActor(this);
+        
+        font = new BitmapFont(Gdx.files.internal("PressStart2P.fnt"),
+                Gdx.files.internal("PressStart2P.png"), false);
     }
 
     @Override
     public void act(float delta) {
-        if(state == State.FADEINLEVEL) {
-            if(currentFadeTime == 0) {
+        if (state == State.SPLASHSCREEN) {
+            upperBoard.addAction(Actions.fadeOut(0));
+            lowerBoard.addAction(Actions.fadeOut(0));
+        } else if (state == State.FADEINLEVEL) {
+            if (currentFadeTime == 0) {
                 upperBoard.addAction(Actions.fadeIn(fadeInTime));
                 lowerBoard.addAction(Actions.fadeIn(fadeInTime));
 
@@ -185,6 +193,12 @@ public class MainLoopActor extends Actor {
     
     @Override
     public void draw(Batch batch, float alpha) {
+        if (state == State.SPLASHSCREEN) {
+            BitmapFont.TextBounds textBounds = font.getWrappedBounds("PRESS ANY KEY", 1000);
+            float x = -textBounds.width / 2;
+            float y = textBounds.height / 2;
+            font.draw(batch, "PRESS ANY KEY", x, y);
+        }
         //upperBoard.draw(batch, alpha);
         //lowerBoard.draw(batch, alpha);
     }
@@ -200,6 +214,8 @@ public class MainLoopActor extends Actor {
                 || upperBoard.unit.getActions().size != 0
         || lowerBoard.unit.getActions().size != 0) {
             return false;
+        } else if (state == State.SPLASHSCREEN) {
+            state = State.FADEINLEVEL;
         }
 
         switch (keycode) {
