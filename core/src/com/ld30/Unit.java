@@ -25,6 +25,9 @@ public class Unit extends Actor {
     int pos_x = 0;
     int pos_y = 0;
     
+    int pos_x_prev = 0;
+    int pos_y_prev = 0;
+    
     boolean isMoving;
 
     public Unit(Board _board) {
@@ -62,10 +65,12 @@ public class Unit extends Actor {
                 addAction(Actions.rotateBy(90.0f*(pos_y-y), 0.2f));
             }
 
-            if(board.positions[pos_y][pos_x] == 'g') {
+            if(board.positions[pos_y][pos_x] == 'g' && (pos_x_prev != x || pos_y_prev != y)) {
                 board.onFlipBlock();
             }
-            
+
+            pos_x_prev = pos_x;
+            pos_y_prev = pos_y;
             pos_x = x;
             pos_y = y;
             

@@ -101,7 +101,7 @@ public class MainLoopActor extends Actor {
     boolean flipBlocksUpper = false;
     boolean flipBlocksLower = false;
 
-    int levelId = 0;
+    int levelId = 6;
     int maxLevelId = 7;
 
     public enum State {
