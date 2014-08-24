@@ -14,6 +14,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -43,34 +44,7 @@ public class LD30 implements ApplicationListener, InputProcessor {
     MainLoopActor mainLoopActor;
     boolean paused = false;
     private Stage stage;
-    ScreenViewport stageViewport;
-    LayoutData layout;
-    LevelCollection levels;
-    
     Color bgColor;
-    Board upperBoard;
-    Board lowerBoard;
-    
-    int levelId = 0;
-    
-    public void checkLevelCompleted() {
-        if(upperBoard.isCompleted() && lowerBoard.isCompleted()) {
-            levelId++;
-          levels.setLevel(levelId);
-          upperBoard.setupBoard(levels.positionsUpper, levels.upper_unit_x, levels.upper_unit_y);
-          lowerBoard.setupBoard(levels.positionsLower, levels.lower_unit_x, levels.lower_unit_y);        
-        }
-    }
-    
-    public void flipBlocks() {
-        if(upperBoard.isOnFlipBlock()) {
-            lowerBoard.flipBlocks();
-        }
-        if (lowerBoard.isOnFlipBlock()) {
-            upperBoard.flipBlocks();
-        }
-    }
-
     
     public void levelComplete() {
        Gdx.app.exit();
@@ -121,54 +95,31 @@ public class LD30 implements ApplicationListener, InputProcessor {
     @Override
     public void create() {
         mainLoopActor = new MainLoopActor();
-        layout = new LayoutData();
+        mainLoopActor.create();
         bgColor = new Color(77/256f, 83/256f, 60/256f, 0.0f);
-        upperBoard = new Board(true);
-        lowerBoard = new Board(false);
-        mainLoopActor.upperBoard = upperBoard;
-        mainLoopActor.lowerBoard = lowerBoard;
-        
-        levels = new LevelCollection();
-        levels.setLevel(levelId);
-        upperBoard.setupBoard(levels.positionsUpper, levels.upper_unit_x, levels.upper_unit_y);
-        lowerBoard.setupBoard(levels.positionsLower, levels.lower_unit_x, levels.lower_unit_y);
-        
-        
+ 
         Gdx.input.setInputProcessor(this);
         
-        stageViewport = new ScreenViewport();
-        stage = new Stage(stageViewport);
-        stage.addActor(mainLoopActor);         
+        stage = mainLoopActor.stage;
         
         resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight()); 
     }
 
     @Override
     public void render() {
+        Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
-        upperBoard.drawBoard();
-        lowerBoard.drawBoard();
-        
         stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-        
-        flipBlocks();
-        checkLevelCompleted();
+        //stage.draw();
+        mainLoopActor.preRender();
+        mainLoopActor.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        layout.calculateLayout();
-
-        stage.getViewport().update(width, height, true);
-        OrthographicCamera camera = ((OrthographicCamera) stageViewport.getCamera());
-        camera.setToOrtho(false, layout.width, layout.height);
-        camera.translate(-layout.width / 2, -layout.height / 2);
-        
-        upperBoard.projectionMatrix = camera.combined;
-        lowerBoard.projectionMatrix = camera.combined;
+        mainLoopActor.resize(width, height);
     }
 
     @Override

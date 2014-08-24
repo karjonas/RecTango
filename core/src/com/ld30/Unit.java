@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+import com.badlogic.gdx.graphics.Color;
 
 /**
  *
@@ -35,6 +36,9 @@ public class Unit extends Actor {
 
     @Override
     public void draw(Batch batch, float alpha) {
+        Color color = getColor();
+        batch.setColor(color.r, color.g, color.b, color.a * alpha);
+
         batch.draw(texture, this.getX(), this.getY(), this.getOriginX(), this.getOriginY(), this.getWidth(),
                 this.getHeight(), this.getScaleX(), this.getScaleY(), this.getRotation(), 0, 0,
                 texture.getWidth(), texture.getHeight(), false, false);
@@ -62,7 +66,7 @@ public class Unit extends Actor {
             pos_y = y;
             
             if(board.positions[y][x] == 'g') {
-                board.onFlipBlock = true;
+                board.onFlipBlock();
             }
         }
         

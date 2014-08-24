@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import java.util.HashMap;
 
 /**
  *
@@ -76,9 +77,12 @@ public class Board extends Actor {
     Texture textureHappy;
     Texture textureSad;
     
-    boolean onFlipBlock = false;
+    MainLoopActor mainLoopActor;
+    HashMap<Integer,CustomBlock> customBlocks;
     
-    public Board(boolean is_upper) {
+    float currentAlpha = 1.0f;
+    
+    public Board(boolean is_upper, MainLoopActor _mainLoopActor) {
         if (is_upper) {
             offset_y += total_height / 2;
             wallColor = new Color(139 / 255f, 149 / 255f, 109 / 255f, 1.0f);
@@ -98,12 +102,13 @@ public class Board extends Actor {
         passColor = new Color(0.0f,1.0f,0.0f,1.0f);
         stopColor = new Color(1.0f,0.0f,0.0f,1.0f);
 
-        
         setWidth(num_width * block_width);
         setHeight(num_height * block_height);
 
         shapeRenderer = new ShapeRenderer();
         unit = new Unit(this);
+        mainLoopActor = _mainLoopActor;
+        customBlocks = new HashMap<Integer, CustomBlock>();
     }
     
     public void setupBoard(char _positions[][], int unit_x, int unit_y) {
@@ -114,6 +119,29 @@ public class Board extends Actor {
         unit.setX(offset_x + block_width * unit.pos_x);
         unit.setY(offset_y + block_height * unit.pos_y);
         unit.setRotation(0);
+        
+        customBlocks.clear();
+        
+        // Add custom actors
+        for (int w = 0; w < num_width; w++) {
+            for (int h = 0; h < num_height; h++) {
+                int hashKey = 2^h*3^w;
+                int x = offset_x + w * block_width;
+                int y = offset_y + h * block_height;
+                
+                if (positions[h][w] == 'r') {
+                    CustomBlock block = new CustomBlock(textureSad);
+                    block.setBounds(x, y, block_width, block_height);
+                    customBlocks.put(hashKey, block);
+                }
+                else if(positions[h][w] == 'g') {
+                    CustomBlock block = new CustomBlock(textureHappy);
+                    block.setBounds(x, y, block_width, block_height);
+                    customBlocks.put(hashKey, block);      
+                }
+            }
+        }
+        
     }
     
     public boolean isCompleted() {
@@ -124,21 +152,20 @@ public class Board extends Actor {
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
                 if (positions[h][w] == 'r') {
+                    int hashKey = 2 ^ h * 3 ^ w;
+                    customBlocks.get(hashKey).texture = textureHappy;
                     positions[h][w] = 'g';
-                }
-                else if(positions[h][w] == 'g') {
+                } else if(positions[h][w] == 'g') {
+                    int hashKey = 2 ^ h * 3 ^ w;
+                    customBlocks.get(hashKey).texture = textureSad;
                     positions[h][w] = 'r';
                 }
             }
         }
     }
     
-    public boolean isOnFlipBlock() {
-        if(onFlipBlock) {
-            onFlipBlock = false;
-            return true;
-        }
-        return false;
+    public void onFlipBlock() {
+        mainLoopActor.onFlipBlock(this);
     }
     
     void moveLeft() {
@@ -157,30 +184,29 @@ public class Board extends Actor {
         unit.moveUp();
     }
 
-    void draw_block_at(int h, int w, Color color) {
+    void draw_block_at(int h, int w, float alpha, Color color) {
+
         int x = offset_x + block_width * w;
         int y = offset_y + block_height * h;
         
         shapeRenderer.setProjectionMatrix(projectionMatrix);
         shapeRenderer.begin(ShapeType.Filled);
-        shapeRenderer.setColor(color.r, color.g, color.b, color.a);
+        shapeRenderer.setColor(color.r, color.g, color.b, color.a * alpha);
+        
         shapeRenderer.rect(x, y, block_width, block_height);
         shapeRenderer.end();
-        
     }    
     
-    public void drawBoard() {
+    public void drawBoard(float alpha) {
+        alpha = currentAlpha * alpha;
+        System.out.println(alpha);
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
                 if (positions[h][w] == 'w') {
-                    draw_block_at(h, w, wallColor);
+                    draw_block_at(h, w, alpha, wallColor);
                 }
-                else if(positions[h][w] == '0') {
-                    draw_block_at(h,w, floorColor);
-                } else if(positions[h][w] == 'r') {
-                    draw_block_at(h,w, stopColor);
-                } else if(positions[h][w] == 'g') {
-                    draw_block_at(h,w, passColor);
+                else if(positions[h][w] == '0' || positions[h][w] == 'r' || positions[h][w] == 'g') {
+                    draw_block_at(h,w, alpha, floorColor);
                 }
             }
         }
@@ -189,25 +215,28 @@ public class Board extends Actor {
     public void drawHappySadBlocks(Batch batch, float alpha) {
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
-                int x = offset_x + w*block_width;
-                int y = offset_y + h*block_height;
-                if (positions[h][w] == 'r') {
-                    batch.draw(textureSad, x, y);
-                } else if (positions[h][w] == 'g') {
-                    batch.draw(textureHappy, x, y);
+                if (positions[h][w] == 'r' || positions[h][w] == 'g') {
+                    int hashKey = 2 ^ h * 3 ^ w;
+                    customBlocks.get(hashKey).draw(batch, alpha);
                 }
             }
         }
     }
     
+    
     @Override
     public void draw(Batch batch, float alpha) {
-        drawHappySadBlocks(batch,alpha);
-        unit.draw(batch, alpha);
+        //System.out.println(alpha);
+        Color color = getColor();
+        batch.setColor(color.r, color.g, color.b, color.a * alpha);
+                currentAlpha = color.a * alpha;
+
+        drawHappySadBlocks(batch,color.a*alpha);
+        //unit.draw(batch, color.a*alpha);
     }
 
-    @Override
-    public void act(float delta) {
-        unit.act(delta);
-    }
+    //@Override
+    //public void act(float delta) {
+    //    unit.act(delta);
+   // }
 }
