@@ -25,14 +25,12 @@ public class Unit extends Actor {
     int pos_y = 0;
     
     boolean isMoving;
-    LD30 mainLoop;
 
-    public Unit(Board _board, LD30 _mainLoop) {
+    public Unit(Board _board) {
         texture = new Texture(Gdx.files.internal("unit.png"));
         setBounds(getX(), getY(), 8, 8);
         setOrigin(getWidth()/2, getHeight()/2);
         board = _board;
-        mainLoop = _mainLoop;
     }
 
     @Override

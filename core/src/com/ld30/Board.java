@@ -78,7 +78,7 @@ public class Board extends Actor {
     
     boolean onFlipBlock = false;
     
-    public Board(boolean is_upper, LD30 _mainLoop) {
+    public Board(boolean is_upper) {
         if (is_upper) {
             offset_y += total_height / 2;
             wallColor = new Color(139 / 255f, 149 / 255f, 109 / 255f, 1.0f);
@@ -103,7 +103,7 @@ public class Board extends Actor {
         setHeight(num_height * block_height);
 
         shapeRenderer = new ShapeRenderer();
-        unit = new Unit(this, _mainLoop);
+        unit = new Unit(this);
     }
     
     public void setupBoard(char _positions[][], int unit_x, int unit_y) {

@@ -40,6 +40,7 @@ import com.badlogic.gdx.graphics.Color;
 
 public class LD30 implements ApplicationListener, InputProcessor {
 
+    MainLoopActor mainLoopActor;
     boolean paused = false;
     private Stage stage;
     ScreenViewport stageViewport;
@@ -50,7 +51,7 @@ public class LD30 implements ApplicationListener, InputProcessor {
     Board upperBoard;
     Board lowerBoard;
     
-    int levelId = 4;
+    int levelId = 0;
     
     public void checkLevelCompleted() {
         if(upperBoard.isCompleted() && lowerBoard.isCompleted()) {
@@ -77,33 +78,14 @@ public class LD30 implements ApplicationListener, InputProcessor {
     
     @Override
     public boolean keyDown(int keycode) {
-        switch (keycode) {
-            case Keys.LEFT:
-                upperBoard.moveLeft();
-                lowerBoard.moveLeft();
-                break;
-            case Keys.RIGHT:
-                upperBoard.moveRight();
-                lowerBoard.moveRight();
-                break;
-            case Keys.UP:
-                upperBoard.moveUp();
-                lowerBoard.moveUp();
-                break;
-            case Keys.DOWN:
-                upperBoard.moveDown();
-                lowerBoard.moveDown();
-                break;
-            case Keys.SPACE:
-                break;
-            case Keys.X:
-        }
+        mainLoopActor.keyDown(keycode);
         return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        return false;
+        mainLoopActor.keyUp(keycode);
+        return true;
     }
 
     @Override
@@ -138,10 +120,14 @@ public class LD30 implements ApplicationListener, InputProcessor {
 
     @Override
     public void create() {
+        mainLoopActor = new MainLoopActor();
         layout = new LayoutData();
         bgColor = new Color(77/256f, 83/256f, 60/256f, 0.0f);
-        upperBoard = new Board(true, this);
-        lowerBoard = new Board(false, this);
+        upperBoard = new Board(true);
+        lowerBoard = new Board(false);
+        mainLoopActor.upperBoard = upperBoard;
+        mainLoopActor.lowerBoard = lowerBoard;
+        
         levels = new LevelCollection();
         levels.setLevel(levelId);
         upperBoard.setupBoard(levels.positionsUpper, levels.upper_unit_x, levels.upper_unit_y);
@@ -152,12 +138,9 @@ public class LD30 implements ApplicationListener, InputProcessor {
         
         stageViewport = new ScreenViewport();
         stage = new Stage(stageViewport);
-        stage.addActor(upperBoard);
-        stage.addActor(lowerBoard);
-         
+        stage.addActor(mainLoopActor);         
         
-        resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        
+        resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight()); 
     }
 
     @Override

@@ -6,7 +6,13 @@
 
 package com.ld30;
 
-
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -49,6 +55,59 @@ import com.badlogic.gdx.graphics.Color;
  *
  * @author jonas
  */
-public class MainLoop {
+public class MainLoopActor extends Actor {
+    
+    Board upperBoard;
+    Board lowerBoard;
+    
+    int lastPressedKey = 0;
+    
+    public MainLoopActor() {
+        
+    }
+
+    @Override
+    public void act(float delta) {
+        if(lastPressedKey != 0)
+            keyDown(lastPressedKey);
+        upperBoard.act(delta);
+        lowerBoard.act(delta);
+    }
+    
+    @Override
+    public void draw(Batch batch, float alpha) {
+        upperBoard.draw(batch, alpha);
+        lowerBoard.draw(batch, alpha);
+    }
+    
+    public boolean keyDown(int keycode) {
+        switch (keycode) {
+            case Keys.LEFT:
+                upperBoard.moveLeft();
+                lowerBoard.moveLeft();
+                break;
+            case Keys.RIGHT:
+                upperBoard.moveRight();
+                lowerBoard.moveRight();
+                break;
+            case Keys.UP:
+                upperBoard.moveUp();
+                lowerBoard.moveUp();
+                break;
+            case Keys.DOWN:
+                upperBoard.moveDown();
+                lowerBoard.moveDown();
+                break;
+        }
+        lastPressedKey = keycode;
+        return true;
+    }
+    
+    void keyUp(int keycode) {
+        if (lastPressedKey == keycode) {
+            lastPressedKey = 0;
+        }
+    };
+    
     
 }
