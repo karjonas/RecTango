@@ -152,9 +152,6 @@ public class Board extends Actor {
                 } else if(positions[h][w] == 'g') {
                     customBlocks.get(hashKey).texture = textureSad;
                     positions[h][w] = 'r';
-                } else if(positions[h][w] == 'd') {
-                    customBlocks.get(hashKey).texture = textureDead;
-                    positions[h][w] = 'r';
                 }
             }
         }
