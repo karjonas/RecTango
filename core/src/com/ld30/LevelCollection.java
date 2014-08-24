@@ -36,8 +36,8 @@ public class LevelCollection {
         pixelToCharMap.put(65535, 'e'); // exit
         pixelToCharMap.put(-65281, 'r'); // Stop block
         pixelToCharMap.put(16777215, 'g'); // Go block
+        pixelToCharMap.put(-1, 'd'); // death block
         pixelToCharMap.put(255, '0'); // nothing
-        
     }
 
     void readPixmap() {

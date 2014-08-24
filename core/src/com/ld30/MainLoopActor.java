@@ -41,8 +41,8 @@ public class MainLoopActor extends Actor {
     boolean flipBlocksUpper = false;
     boolean flipBlocksLower = false;
 
-    int levelId = 7;
-    int maxLevelId = 8;
+    int levelId = 9;
+    int maxLevelId = 10;
 
     public enum State {
         SPLASHSCREEN, RUNNING, FADEINLEVEL, FADEOUTLEVEL, FINSIHED
@@ -50,7 +50,7 @@ public class MainLoopActor extends Actor {
     
     State state = State.SPLASHSCREEN;
     
-    float fadeInTime = 1.0f;
+    float fadeInTime = 0.5f;
 
     public MainLoopActor() {
         setBounds(getX(), getY(), 8, 8);
@@ -104,6 +104,14 @@ public class MainLoopActor extends Actor {
                 }
             }
         } else if (state == State.RUNNING) {
+            { // Check if any death
+                if(upperBoard.isDead() || lowerBoard.isDead()) {
+                    state = State.FADEOUTLEVEL;
+                    upperBoard.addAction(Actions.fadeOut(0.5f));
+                    lowerBoard.addAction(Actions.fadeOut(0.5f));
+                }
+            }
+            
             { // Flip blocks
                 if (flipBlocksUpper && !flipBlocksLower) {
                     flipSound.play();
@@ -121,8 +129,8 @@ public class MainLoopActor extends Actor {
                 if (upperBoard.isCompleted() && lowerBoard.isCompleted()) {
                     levelId++;
                     state = State.FADEOUTLEVEL;
-                    upperBoard.addAction(Actions.fadeOut(0.5f));
-                    lowerBoard.addAction(Actions.fadeOut(0.5f));
+                    upperBoard.addAction(Actions.fadeOut(0.3f));
+                    lowerBoard.addAction(Actions.fadeOut(0.3f));
                     winSound.play();
                 }
             }

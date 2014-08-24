@@ -47,6 +47,7 @@ public class Board extends Actor {
     
     Texture textureHappy;
     Texture textureSad;
+    Texture textureDead;
     
     MainLoopActor mainLoopActor;
     HashMap<Integer,CustomBlock> customBlocks;
@@ -61,6 +62,8 @@ public class Board extends Actor {
 
             textureHappy = new Texture(Gdx.files.internal("block_upper_happy.png"));
             textureSad = new Texture(Gdx.files.internal("block_upper_sad.png"));
+            textureDead = new Texture(Gdx.files.internal("block_upper_death.png"));
+
         } else {
             offset_y -= total_height / 2;
             wallColor = new Color(31 / 255f, 31 / 255f, 31 / 255f, 1.0f);
@@ -68,6 +71,7 @@ public class Board extends Actor {
             
             textureHappy = new Texture(Gdx.files.internal("block_lower_happy.png"));
             textureSad = new Texture(Gdx.files.internal("block_lower_sad.png"));
+            textureDead = new Texture(Gdx.files.internal("block_lower_death.png"));
         }
         
         passColor = new Color(0.0f,1.0f,0.0f,1.0f);
@@ -83,7 +87,7 @@ public class Board extends Actor {
     }
     
     public int getHashKey(int h, int w) {
-        return num_height*h + w;
+        return (num_width*h) + w;
     }
     
     public void setupBoard(char _positions[][], int unit_x, int unit_y) {
@@ -106,6 +110,10 @@ public class Board extends Actor {
                 int x = offset_x + w * block_width;
                 int y = offset_y + h * block_height;
                 
+                if(customBlocks.get(hashKey) != null) {
+                    boolean fail =true;
+                }
+                
                 if (positions[h][w] == 'r') {
                     CustomBlock block = new CustomBlock(textureSad);
                     block.setBounds(x, y, block_width, block_height);
@@ -113,6 +121,10 @@ public class Board extends Actor {
                 }
                 else if(positions[h][w] == 'g') {
                     CustomBlock block = new CustomBlock(textureHappy);
+                    block.setBounds(x, y, block_width, block_height);
+                    customBlocks.put(hashKey, block);      
+                } else if(positions[h][w] == 'd') {
+                    CustomBlock block = new CustomBlock(textureDead);
                     block.setBounds(x, y, block_width, block_height);
                     customBlocks.put(hashKey, block);      
                 }
@@ -123,6 +135,10 @@ public class Board extends Actor {
     
     public boolean isCompleted() {
         return (positions[unit.pos_y][unit.pos_x] == 'e' && unit.getActions().size == 0);
+    }
+
+    public boolean isDead() {
+        return (positions[unit.pos_y][unit.pos_x] == 'd');
     }
     
     public void flipBlocks() {
@@ -135,6 +151,9 @@ public class Board extends Actor {
                     positions[h][w] = 'g';
                 } else if(positions[h][w] == 'g') {
                     customBlocks.get(hashKey).texture = textureSad;
+                    positions[h][w] = 'r';
+                } else if(positions[h][w] == 'd') {
+                    customBlocks.get(hashKey).texture = textureDead;
                     positions[h][w] = 'r';
                 }
             }
@@ -181,7 +200,7 @@ public class Board extends Actor {
                 if (positions[h][w] == 'w') {
                     draw_block_at(h, w, alpha, wallColor);
                 }
-                else if(positions[h][w] == '0' || positions[h][w] == 'r' || positions[h][w] == 'g') {
+                else if(positions[h][w] == '0' || positions[h][w] == 'r' || positions[h][w] == 'g' || positions[h][w] == 'd') {
                     draw_block_at(h,w, alpha, floorColor);
                 }
             }
@@ -191,7 +210,7 @@ public class Board extends Actor {
     public void drawHappySadBlocks(Batch batch, float alpha) {
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
-                if (positions[h][w] == 'r' || positions[h][w] == 'g') {
+                if (positions[h][w] == 'r' || positions[h][w] == 'g' || positions[h][w] == 'd') {
                     int hashKey = getHashKey(h,w);
                     customBlocks.get(hashKey).draw(batch, alpha);
                 }
