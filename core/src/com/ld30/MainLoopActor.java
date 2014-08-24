@@ -101,17 +101,16 @@ public class MainLoopActor extends Actor {
     boolean flipBlocksUpper = false;
     boolean flipBlocksLower = false;
 
-    int levelId = 0;
+    int levelId = 5;
+    int maxLevelId = 6;
 
     public enum State {
-        SPLASHSCREEN, RUNNING, FADEINLEVEL, FADEOUTLEVEL
+        SPLASHSCREEN, RUNNING, FADEINLEVEL, FADEOUTLEVEL, FINSIHED
     };
     
     State state = State.SPLASHSCREEN;
     
     float fadeInTime = 1.0f;
-    float currentFadeTime = 0.0f;
-    //float currentAlpha = 0.0f;
 
     public MainLoopActor() {
                 setBounds(getX(), getY(), 8, 8);
@@ -132,6 +131,9 @@ public class MainLoopActor extends Actor {
         stage.addActor(lowerBoard.unit);
         stage.addActor(this);
         
+        upperBoard.addAction(Actions.fadeOut(0));
+        lowerBoard.addAction(Actions.fadeOut(0));
+        
         font = new BitmapFont(Gdx.files.internal("PressStart2P.fnt"),
                 Gdx.files.internal("PressStart2P.png"), false);
     }
@@ -139,35 +141,25 @@ public class MainLoopActor extends Actor {
     @Override
     public void act(float delta) {
         if (state == State.SPLASHSCREEN) {
-            upperBoard.addAction(Actions.fadeOut(0));
-            lowerBoard.addAction(Actions.fadeOut(0));
-        } else if (state == State.FADEINLEVEL) {
-            if (currentFadeTime == 0) {
-                upperBoard.addAction(Actions.fadeIn(fadeInTime));
-                lowerBoard.addAction(Actions.fadeIn(fadeInTime));
 
-                
-                    levels.setLevel(levelId);
-                    upperBoard.setupBoard(levels.positionsUpper, levels.upper_unit_x, levels.upper_unit_y);
-                    lowerBoard.setupBoard(levels.positionsLower, levels.lower_unit_x, levels.lower_unit_y);
-            }
-            currentFadeTime += delta;
-            
-            if (currentFadeTime >= fadeInTime) {
-                state = State.RUNNING;
-                //currentAlpha = 1.0f;
-            }
-            
-            //currentAlpha = currentFadeTime/fadeInTime;
+        } else if (state == State.FADEINLEVEL) {
+            upperBoard.addAction(Actions.fadeIn(fadeInTime));
+            lowerBoard.addAction(Actions.fadeIn(fadeInTime));
+
+            levels.setLevel(levelId);
+            upperBoard.setupBoard(levels.positionsUpper, levels.upper_unit_x, levels.upper_unit_y);
+            lowerBoard.setupBoard(levels.positionsLower, levels.lower_unit_x, levels.lower_unit_y);
+
+            state = State.RUNNING;
         } else if (state == State.FADEOUTLEVEL) {
-            if(upperBoard.getActions().size == 0 && lowerBoard.getActions().size == 0) {
-                state = State.FADEINLEVEL;
+            if (upperBoard.getActions().size == 0 && lowerBoard.getActions().size == 0) {
+                if(levelId == maxLevelId) {
+                    state = State.FINSIHED;
+                } else {
+                    state = State.FADEINLEVEL;
+                }
             }
         } else if (state == State.RUNNING) {
-            if (lastPressedKey != 0) {
-                keyDown(lastPressedKey);
-            }
-
             { // Flip blocks
                 if (flipBlocksUpper && !flipBlocksLower) {
                     upperBoard.flipBlocks();
@@ -182,11 +174,14 @@ public class MainLoopActor extends Actor {
             { // Check if level completed
                 if (upperBoard.isCompleted() && lowerBoard.isCompleted()) {
                     levelId++;
-                    currentFadeTime = 0.0f;
                     state = State.FADEOUTLEVEL;
                     upperBoard.addAction(Actions.fadeOut(0.5f));
                     lowerBoard.addAction(Actions.fadeOut(0.5f));
                 }
+            }
+            
+            if (lastPressedKey != 0) {
+                keyDown(lastPressedKey);
             }
         }
     }
@@ -198,9 +193,12 @@ public class MainLoopActor extends Actor {
             float x = -textBounds.width / 2;
             float y = textBounds.height / 2;
             font.draw(batch, "PRESS ANY KEY", x, y);
+        } else if (state == State.FINSIHED) {
+            BitmapFont.TextBounds textBounds = font.getWrappedBounds("THANKS FOR PLAYING!", 1000);
+            float x = -textBounds.width / 2;
+            float y = textBounds.height / 2;
+            font.draw(batch, "THANKS FOR PLAYING!", x, y);
         }
-        //upperBoard.draw(batch, alpha);
-        //lowerBoard.draw(batch, alpha);
     }
     
     public void draw() {
@@ -212,7 +210,9 @@ public class MainLoopActor extends Actor {
 
         if (state == State.FADEINLEVEL
                 || upperBoard.unit.getActions().size != 0
-        || lowerBoard.unit.getActions().size != 0) {
+                || lowerBoard.unit.getActions().size != 0
+                || upperBoard.getActions().size != 0
+                || lowerBoard.getActions().size != 0) {
             return false;
         } else if (state == State.SPLASHSCREEN) {
             state = State.FADEINLEVEL;
@@ -234,6 +234,19 @@ public class MainLoopActor extends Actor {
             case Keys.DOWN:
                 upperBoard.moveDown();
                 lowerBoard.moveDown();
+                break;
+            case Keys.ESCAPE:
+                Gdx.app.exit();
+                break;
+            case Keys.ENTER:
+                if (state == State.FINSIHED) {
+                    Gdx.app.exit();
+                }
+                break;
+            case Keys.SPACE:
+                if (state == State.FINSIHED) {
+                    Gdx.app.exit();
+                }
                 break;
         }
         return true;
