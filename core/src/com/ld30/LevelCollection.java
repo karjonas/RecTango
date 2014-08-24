@@ -85,5 +85,4 @@ public class LevelCollection {
         currentLevelMap = new Pixmap(Gdx.files.internal("level" + levelId + ".png"));
         readPixmap();
     }
-
 }
