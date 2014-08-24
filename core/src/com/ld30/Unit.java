@@ -62,12 +62,13 @@ public class Unit extends Actor {
                 addAction(Actions.rotateBy(90.0f*(pos_y-y), 0.2f));
             }
 
+            if(board.positions[pos_y][pos_x] == 'g') {
+                board.onFlipBlock();
+            }
+            
             pos_x = x;
             pos_y = y;
             
-            if(board.positions[y][x] == 'g') {
-                board.onFlipBlock();
-            }
         }
         
     }

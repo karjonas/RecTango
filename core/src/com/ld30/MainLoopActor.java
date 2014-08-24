@@ -101,8 +101,8 @@ public class MainLoopActor extends Actor {
     boolean flipBlocksUpper = false;
     boolean flipBlocksLower = false;
 
-    int levelId = 5;
-    int maxLevelId = 6;
+    int levelId = 0;
+    int maxLevelId = 7;
 
     public enum State {
         SPLASHSCREEN, RUNNING, FADEINLEVEL, FADEOUTLEVEL, FINSIHED
