@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ld30;
+package com.rectango;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -43,7 +43,7 @@ public class Board extends Actor {
     Color stopColor;
     
     Unit unit;
-    LD30 mainLoop;
+    RecTango mainLoop;
     
     Texture textureHappy;
     Texture textureSad;

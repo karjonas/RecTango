@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.ld30;
+package com.rectango;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

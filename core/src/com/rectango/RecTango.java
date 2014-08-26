@@ -1,4 +1,4 @@
-package com.ld30;
+package com.rectango;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.Color;
 
-public class LD30 implements ApplicationListener, InputProcessor {
+public class RecTango implements ApplicationListener, InputProcessor {
 
     MainLoopActor mainLoopActor;
     boolean paused = false;
