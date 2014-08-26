@@ -7,7 +7,7 @@ Building and running
 --------------------
 Install a JVM, then run:
 ```
-gradlew desktop:dist
+./gradlew desktop:dist
 ```
 This will create a runnable JAR file located in the desktop/build/libs/ folder. 
 Then run the application:
