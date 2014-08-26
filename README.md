@@ -16,7 +16,7 @@ java -jar desktop/build/libs/desktop-1.0.jar
 ```
 Screenshots
 -----------
-![Screenshot 1](/img/screenshot.png?raw=true)
+![Screenshot 1](screenshot.png?raw=true)
 
 License and Attribution
 -----------------------
