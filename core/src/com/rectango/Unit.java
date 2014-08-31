@@ -47,7 +47,7 @@ public class Unit extends Actor {
         if(getActions().size > 0 || x < 0 || x >= board.num_width || y < 0 || y >=board.num_height)
             return;
         
-        if(board.positions[y][x] != 'w' && board.positions[y][x] != 'r') {
+        if(board.isWalkable(y,x)) {
             int new_x = board.offset_x + board.block_width*x;
             int new_y = board.offset_y + board.block_height*y;
             
@@ -60,7 +60,7 @@ public class Unit extends Actor {
                 addAction(Actions.rotateBy(90.0f*(pos_y-y), 0.2f));
             }
 
-            if(board.positions[pos_y][pos_x] == 'g' && (pos_x_prev != x || pos_y_prev != y)) {
+            if(board.isFlipBlock(pos_y, pos_x) && (pos_x_prev != x || pos_y_prev != y)) {
                 board.onFlipBlock();
             }
 

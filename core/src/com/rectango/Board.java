@@ -14,6 +14,9 @@ import java.util.HashMap;
  *
  * @author jonas
  */
+
+enum BlockType { EMPTY, WALL, UNIT, EXIT, STOP, PASS, DEATH }
+
 public class Board extends Actor {
 
     int num_width = 20;
@@ -21,7 +24,7 @@ public class Board extends Actor {
     int block_width = 8;
     int block_height = 8;
 
-    char positions[][] = new char[num_height][num_width];
+    BlockType positions[][] = new BlockType[num_height][num_width];
 
     int total_width = num_width * block_width;
     int total_height = num_height * block_height;
@@ -85,7 +88,7 @@ public class Board extends Actor {
         return (num_width*h) + w;
     }
     
-    public void setupBoard(char _positions[][], int unit_x, int unit_y) {
+    public void setupBoard(BlockType _positions[][], int unit_x, int unit_y) {
         positions = _positions;
         unit.pos_x = unit_x;
         unit.pos_y = unit_y;
@@ -104,20 +107,15 @@ public class Board extends Actor {
                 int x = offset_x + w * block_width;
                 int y = offset_y + h * block_height;
                 
-                if(customBlocks.get(hashKey) != null) {
-                    boolean fail =true;
-                }
-                
-                if (positions[h][w] == 'r') {
+                if (positions[h][w] == BlockType.STOP) {
                     CustomBlock block = new CustomBlock(textureSad);
                     block.setBounds(x, y, block_width, block_height);
                     customBlocks.put(hashKey, block);
-                }
-                else if(positions[h][w] == 'g') {
+                } else if(positions[h][w] == BlockType.PASS) {
                     CustomBlock block = new CustomBlock(textureHappy);
                     block.setBounds(x, y, block_width, block_height);
                     customBlocks.put(hashKey, block);      
-                } else if(positions[h][w] == 'd') {
+                } else if(positions[h][w] == BlockType.DEATH) {
                     CustomBlock block = new CustomBlock(textureDead);
                     block.setBounds(x, y, block_width, block_height);
                     customBlocks.put(hashKey, block);      
@@ -128,24 +126,24 @@ public class Board extends Actor {
     }
     
     public boolean isCompleted() {
-        return (positions[unit.pos_y][unit.pos_x] == 'e' && unit.getActions().size == 0);
+        return (positions[unit.pos_y][unit.pos_x] == BlockType.EXIT
+             && unit.getActions().size == 0);
     }
 
     public boolean isDead() {
-        return (positions[unit.pos_y][unit.pos_x] == 'd');
+        return (positions[unit.pos_y][unit.pos_x] == BlockType.DEATH);
     }
     
     public void flipBlocks() {
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
                 int hashKey = getHashKey(h, w);
-
-                if (positions[h][w] == 'r') {
+                if (positions[h][w] == BlockType.STOP) {
                     customBlocks.get(hashKey).texture = textureHappy;
-                    positions[h][w] = 'g';
-                } else if(positions[h][w] == 'g') {
+                    positions[h][w] = BlockType.PASS;
+                } else if(positions[h][w] == BlockType.PASS) {
                     customBlocks.get(hashKey).texture = textureSad;
-                    positions[h][w] = 'r';
+                    positions[h][w] = BlockType.STOP;
                 }
             }
         }
@@ -155,6 +153,20 @@ public class Board extends Actor {
         mainLoopActor.onFlipBlock(this);
     }
     
+    public boolean isFlipBlock(int h, int w) {
+        return (positions[h][w] == BlockType.PASS);
+    }
+    
+    public boolean isWalkable(int h, int w) {
+        return (positions[h][w] != BlockType.WALL
+             && positions[h][w] != BlockType.STOP);
+    }
+    
+    public boolean isCustomBlock(int h, int w) {
+        return (positions[h][w] == BlockType.PASS
+             || positions[h][w] == BlockType.STOP
+             || positions[h][w] == BlockType.DEATH);
+    }    
     void moveLeft() {
         unit.moveLeft();
     }
@@ -188,10 +200,9 @@ public class Board extends Actor {
         alpha = currentAlpha * alpha;
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
-                if (positions[h][w] == 'w') {
+                if (positions[h][w] == BlockType.WALL) {
                     draw_block_at(h, w, alpha, wallColor);
-                }
-                else if(positions[h][w] == '0' || positions[h][w] == 'r' || positions[h][w] == 'g' || positions[h][w] == 'd') {
+                } else if(isCustomBlock(h, w)|| positions[h][w] == BlockType.EMPTY) {
                     draw_block_at(h,w, alpha, floorColor);
                 }
             }
@@ -201,7 +212,7 @@ public class Board extends Actor {
     public void drawHappySadBlocks(Batch batch, float alpha) {
         for (int w = 0; w < num_width; w++) {
             for (int h = 0; h < num_height; h++) {
-                if (positions[h][w] == 'r' || positions[h][w] == 'g' || positions[h][w] == 'd') {
+                if (isCustomBlock(h, w)) {
                     int hashKey = getHashKey(h,w);
                     customBlocks.get(hashKey).draw(batch, alpha);
                 }
